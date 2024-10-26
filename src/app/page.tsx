@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -10,9 +11,9 @@ export default function Home() {
             This combination empowers seamless integration between Next.js and
             WordPress, providing dynamic and efficient web experiences.
           </p>
-          <a href='/blog' className='btn'>
+          <Link href='/blog' className='btn'>
             Read Blog Posts
-          </a>
+          </Link>
         </div>
         <Image
           className='dark:invert'
