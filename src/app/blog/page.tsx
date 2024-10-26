@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import camelCase from 'lodash.camelcase';
+// TODO: check kebab case meta to show particular post
 import {
   Key,
   ReactElement,
@@ -36,19 +36,6 @@ type Post = {
 let cache: { posts: Post[]; timestamp: number } | null = null;
 const CACHE_DURATION = 1000 * 60 * 10; // 10 minutes
 
-function convertKeysToCamelCase(obj: any) {
-  if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
-    return Object.keys(obj).reduce((acc, key) => {
-      const camelKey = camelCase(key);
-      acc[camelKey] = convertKeysToCamelCase(obj[key]);
-      return acc;
-    }, {} as any);
-  } else if (Array.isArray(obj)) {
-    return obj.map((item) => convertKeysToCamelCase(item));
-  }
-  return obj;
-}
-
 async function getPosts() {
   const now = Date.now();
   if (cache && now - cache.timestamp < CACHE_DURATION) {
@@ -60,9 +47,9 @@ async function getPosts() {
     `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/posts?per_page=20`
   );
   const posts = await response.json();
-  const transformedPosts = posts.map((post: any) => ({
+  const transformedPosts = posts.map((post: Post) => ({
     ...post,
-    meta: convertKeysToCamelCase(post.meta),
+    meta: post.meta || {},
   }));
   cache = {
     posts: transformedPosts,
@@ -81,11 +68,6 @@ const BlogPage = async () => {
       <p>All blog posts are fetched from WordPress via the WP REST API.</p>
       <div className='posts prose'>
         {posts.map((post: Post) => {
-          // console.log(
-          //   post.meta.tcFeaturedArticle,
-          //   post.meta.tcBreakingNews,
-          //   post.meta.tcArticleBrief
-          // );
           return (
             <Link href={`/blog/${post.slug}`} className='post' key={post.slug}>
               <h3>{post.title.rendered}</h3>
