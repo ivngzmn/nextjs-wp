@@ -3,7 +3,7 @@ export const dynamicParams = false;
 export async function generateStaticParams() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/posts`
+      `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/posts?per_page=20`
     );
     const posts = await response.json();
 
