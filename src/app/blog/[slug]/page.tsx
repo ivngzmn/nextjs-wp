@@ -1,4 +1,5 @@
-export const dynamicParams = false;
+import Link from 'next/link';
+import Image from 'next/image';
 
 export async function generateStaticParams() {
   try {
@@ -26,6 +27,7 @@ type Post = {
   id: number;
   title: { rendered: string };
   content: { rendered: string };
+  featured_media: number;
   // other fields from wp...
 };
 
@@ -56,20 +58,44 @@ async function getSinglePost(slug: string) {
   return post[0];
 }
 
-import Link from 'next/link';
+async function getMediaById(id: number) {
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_WORDPRESS_API_URL + `/media/${id}`
+  );
+  const media = await response.json();
+  return {
+    id: media.id,
+    source_url: media.source_url,
+    alt_text: media.alt_text,
+  };
+}
 
 async function page(props: { params: Params }) {
   const params = await props.params;
   const slug = params.slug;
   const post = await getSinglePost(slug);
-
+  const featuredImage = await getMediaById(post.featured_media);
+  console.log('featuredImage', featuredImage);
   return (
-    <div className='single-blog-page grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
+    <div className='grid justify-items-center h-fit p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
       <Link href='/blog'>Back</Link>
-      <h2>{post.title.rendered}</h2>
-      <div className='blog-post prose '>
-        <div dangerouslySetInnerHTML={{ __html: post.content.rendered }}></div>
-      </div>
+      <article className='prose'>
+        <Image
+          width={800}
+          height={400}
+          src={featuredImage.source_url}
+          alt={featuredImage.alt_text}
+          loading='lazy'
+          style={{ objectFit: 'contain' }}
+          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+        />
+        <h1 dangerouslySetInnerHTML={{ __html: post.title.rendered }}></h1>
+        <div className='blog-post'>
+          <div
+            dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+          ></div>
+        </div>
+      </article>
     </div>
   );
 }
