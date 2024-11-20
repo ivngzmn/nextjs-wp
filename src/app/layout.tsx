@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 
+import { SiteHeader } from '@/components/site-header';
+
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -29,10 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased grid grid-rows-[auto_1fr_auto]`}
       >
-        <header>
-          {/* header goes here  */}
-          Our header
-        </header>
+        <SiteHeader />
         {children}
         <footer className=''>
           {/* footer goes here */}
@@ -42,3 +41,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+
